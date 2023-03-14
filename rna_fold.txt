@@ -1,0 +1,21 @@
+        self.convsal1 = nn.Conv1d(in_channels=filters//2, out_channels=rank, kernel_size=kernel, 
+                                  padding=pad, stride=1)
+        self.convsal2 = nn.Conv1d(in_channels=filters//2,  out_channels=rank, kernel_size=kernel,
+                                  padding = pad, stride=1)
+
+    def forward(self, x, *args):
+        """args includes additional variables from dataloader (like the masks)"""
+        n = x.shape[2]
+        y = self.cnn(x)
+        ya = self.convsal1(y)
+        ya = tr.transpose(ya, -1, -2)
+
+        yb = self.convsal2(y)
+        
+        y = ya @ yb
+        yt =  tr.transpose(y, -1, -2)
+        
+        y = (y+yt)/2
+    
+        y = y.view(-1, n, n)
+        return y
