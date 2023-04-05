@@ -1,2 +1,0 @@
-usar scores de cercania a cada familia.
-identificar la familia y usar esa informacion para el entrenamiento.

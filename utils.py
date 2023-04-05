@@ -1,5 +1,7 @@
-
-
+import os 
+import numpy as np
+import torch as tr 
+import pandas as pd 
 
 def seq_to_pair(seq):
     seq_np=list(seq)
@@ -12,8 +14,8 @@ def seq_to_pair(seq):
             pairs.append([seq_open[-1],it+1])
             seq_open=seq_open[:-1]
     pairs=pairs[::-1]
-    pairs=', '.join(str(e) for e in pairs)
-    pairs='['+pairs+']'
+    # pairs=', '.join(str(e) for e in pairs)
+    # pairs='['+pairs+']'
     return pairs
 
 
@@ -57,16 +59,37 @@ def dot_to_motif(seq, struct):
     os.remove('tmp.st')
     return motif
 
-def list_to_string(s):
-    str1 = ""
-    for ele in s:
-        str1 += ele
-    return str1
+def seq_len(seq):
+   lenght=len(list(seq))
+   return lenght
 
 def make_data_set(data_set):
-    header= 'id,method,sequence,structure,motif,base_pairs,header,date,resolution,len\n'
-    data=header
-    for i in data_set[:]:
-        pair=seq_to_pair(i[2])
-        data=data+i[0]+',SOLUTION NMR,'+i[1]+','+i[2]+','+'"'+pair+'"'+'\n'
+    data=[['id','sequence','structure','base_pairs','len']]
+    for i in data_set[1:]:
+        if seq_len(i[3]) < 800:
+            data.append([i[1],i[3],i[4],seq_to_pair(i[4]),seq_len(i[3])])
+      
+
+        # data=data+i[0]+',SOLUTION NMR,'+i[1]+','+i[2]+','+'"'+pair+'"'+','+str(lenght)+'\n'
+    writer=pd.DataFrame(data)
+    writer.to_csv('dist03.csv',sep=',',header=False,index=False)
     return data
+
+def valid_mask(seq):
+    """Create a NxN mask with valid canonic pairings."""
+    valid_pairs = [{"G", "C"}, {"A", "U"}, {"G", "U"}]
+    mask = tr.zeros((len(seq), len(seq)), dtype=tr.float32)
+    for i in range(len(seq)):
+        for j in range(len(seq)):
+            if i != j:
+                if {seq[i], seq[j]} in valid_pairs:
+                    mask[i, j] = 1
+                    mask[j, i] = 1
+    return mask
+
+def fam_oneHot (fam):
+    families = np.array(['5s', 'tmRNA', 'tRNA', 'srp', 'grp1', 'RNaseP', '23s','telomerase', '16s'])
+    index = np.where(families==fam)
+    onehot= np.zeros(families.shape)
+    onehot[index]=1
+    return onehot
