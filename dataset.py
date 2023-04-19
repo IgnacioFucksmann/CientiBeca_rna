@@ -28,7 +28,7 @@ class DatasetSeq(Dataset):
         dat = dat[(dat.len > min_len) & (dat.len < max_len)]
         dat = dat.reset_index(drop=True)
         self.id=dat.id
-        
+        self.cluster=dat.cluster
         self.seq=dat.sequence.tolist()
         self.struct=dat.structure
         self.pair=[json.loads(dat.base_pairs.iloc[i]) for i in range(len(dat))]

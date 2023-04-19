@@ -1,6 +1,9 @@
 /env_sinc
 /data/SequenceIdentity_f_all.csv
+/data/rnadist.h5
+/data/rnadist.csv
 /data/archiveII_220808.csv
 /data/urs_pdb_unique.csv
 dist01.csv
 results
+RNA_dist/data
